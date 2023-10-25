@@ -2,22 +2,7 @@ const {nanoid} = require('nanoid');
 const books = require('./books');
 
 const addBookHandler = (req, h) => {
-  const {name, year, author, summary,
-    publisher, pageCount, readPage, reading} = req.payload;
-
-  const id = nanoid(20);
-  const finished = pageCount === readPage;
-  const insertedAt = new Date().toISOString();
-  const updatedAt = insertedAt;
-
-  const newBook = {
-    id, name, year, author, summary,
-    publisher, pageCount, readPage, finished, reading,
-    insertedAt, updatedAt,
-  };
-  books.push(newBook);
-
-  // const isSuccess = books.filter((book) => book.id === id).length > 0;
+  const { name, year, author, summary, publisher, pageCount, readPage, reading } = req.payload;
 
   if (!name) {
     const response = h.response({
@@ -29,12 +14,32 @@ const addBookHandler = (req, h) => {
   } else if (readPage > pageCount) {
     const response = h.response({
       status: 'fail',
-      message: 'Gagal menambahkan buku.' +
-      ' readPage tidak boleh lebih besar dari pageCount',
+      message: 'Gagal menambahkan buku. readPage tidak boleh lebih besar dari pageCount',
     });
     response.code(400);
     return response;
   }
+
+  const id = nanoid(20);
+  const finished = pageCount === readPage;
+  const insertedAt = new Date().toISOString();
+  const updatedAt = insertedAt;
+
+  const newBook = {
+    id,
+    name,
+    year,
+    author,
+    summary,
+    publisher,
+    pageCount,
+    readPage,
+    finished,
+    reading,
+    insertedAt,
+    updatedAt,
+  };
+  books.push(newBook);
 
   const response = h.response({
     status: 'success',
@@ -55,7 +60,7 @@ const addBookHandler = (req, h) => {
 // });
 
 const getAllBookHandler = (req, h) => {
-  const {finished, name, reading} = req.query;
+  const {finished, name, reading, requestGET} = req.query;
   // const filterName = books.filter((book) =>
   //   book.name.toLowerCase() === name.toLowerCase());
 
@@ -129,7 +134,7 @@ const getAllBookHandler = (req, h) => {
       return {
         status: 'success',
         data: {
-          books: fixBooksUnreading,
+          books: fixBooksUnreading ,
         },
       };
     } else if (name) {
